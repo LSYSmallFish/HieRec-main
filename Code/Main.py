@@ -1,6 +1,6 @@
 import os
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+#os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 
 import tensorflow as tf
 import keras.backend.tensorflow_backend as KTF
@@ -16,9 +16,9 @@ from models import *
 from hypers import *
 from utils import *
 
-data_root_path = 'D:\\学习\\code\\HieRec-main\\pretrained\\dataset'
-embedding_path = 'D:\\学习\\code\\HieRec-main\\pretrained\\embedding'
-KG_root_path = 'D:\\学习\\code\\HieRec-main\\pretrained\\KG'
+data_root_path = 'D:\\program\\code\\HieRec-main\\pretrained\\dataset'
+embedding_path = 'D:\\program\\code\\HieRec-main\\pretrained\\embedding'
+KG_root_path = 'D:\\program\\code\\HieRec-main\\pretrained\\KG'
 
 # data_root_path = 'D:\\学习\\code\\HieRec-main\\pretrained\\dataset'
 # embedding_path = 'D:\\学习\\code\\HieRec-main\\pretrained\\embedding'
@@ -148,7 +148,7 @@ class get_hir_train_generator(Sequence):
 
         rw_vert = rw_vert * train_mask
         rw_subvert = rw_subvert * train_mask
-
+        print(label)
         return ([title, vert, subvert, user_title, user_vert, user_vert_mask, user_subvert, user_subvert_mask,
                  vert_subvert_mask_input, user_vert_num, user_subvert_num, rw_vert, rw_subvert], [label])
 
@@ -272,6 +272,7 @@ def evaluate_combine2(test_impressions, users, user_subvert_rep, user_vert_rep, 
         MRR.append(mrr)
         nDCG5.append(ndcg5)
         nDCG10.append(ndcg10)
+
 
     return AUC, MRR, nDCG5, nDCG10
 

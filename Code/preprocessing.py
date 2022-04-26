@@ -8,7 +8,7 @@ from nltk.tokenize import word_tokenize
 import json
 import nltk
 
-nltk.download('punkt')
+nltk.data.path.append('D:\\program\\code\\HieRec-main\\nltk_data')
 
 
 def trans2tsp(timestr):
@@ -93,7 +93,7 @@ def get_doc_input(news, news_index, category, subcategory, word_dict):
 def load_matrix(embedding_path, word_dict):
     embedding_matrix = np.zeros((len(word_dict) + 1, 300))
     have_word = []
-    with open(os.path.join(embedding_path, 'glove.840B.300d.txt'), 'rb', encoding='utf-8') as f:
+    with open(os.path.join(embedding_path, 'glove.840B.300d.txt'), 'rb') as f:
         while True:
             l = f.readline()
             if len(l) == 0:
@@ -263,7 +263,7 @@ def load_news_entity(news_index, KG_root_path):
 def load_entity_embedding(KG_root_path, EntityId2Index):
     entity_emb = np.zeros((len(EntityId2Index) + 1, 100))
     import pickle
-    with open(os.path.join(KG_root_path, 'title_entity_emb.pkl'), 'rb', encoding='utf-8') as f:
+    with open(os.path.join(KG_root_path, 'title_entity_emb.pkl'), 'rb') as f:
         title_entity_emb = pickle.load(f)
     for eid in EntityId2Index:
         eix = EntityId2Index[eid]

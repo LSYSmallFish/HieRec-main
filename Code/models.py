@@ -270,6 +270,18 @@ def HirUserEncoder(category_dict, subcategory_dict):
                  [user_subvert_rep, user_vert_rep, user_global_rep])
 
 
+# 尝试增加R-dropout
+def categorical_crossentropy_with_rdrop(y_true, y_pred, alpha=1):
+    """配合上述生成器的R-Drop Loss
+    其实loss_kl的除以4，是为了在数量上对齐公式描述结果。
+    """
+    loss_ce = K.categorical_crossentropy(y_true, y_pred)  # 原来的loss
+    # 这里调用K.Sparse，一部分是常规的交叉熵
+    loss_kl = kld(y_pred[::2], y_pred[1::2]) + kld(y_pred[1::2], y_pred[::2])
+    # 另一部分是两个模型的对称KL散度
+    return K.mean(loss_ce) + K.mean(loss_kl) / 4 * alpha
+
+
 def create_model(category_dict, subcategory_dict, title_word_embedding_matrix, entity_emb_matrix):
     MAX_LENGTH = 35
     news_encoder = get_doc_encoder(title_word_embedding_matrix, entity_emb_matrix)
@@ -324,13 +336,13 @@ def create_model(category_dict, subcategory_dict, title_word_embedding_matrix, e
 
     logits = keras.layers.Activation(keras.activations.softmax, name='recommend')(scores)
 
+
     model = Model([title_inputs, vert_inputs, subvert_inputs,
                    clicked_title_input, clicked_vert_input, clicked_vert_mask_input,
                    clicked_subvert_input, clicked_subvert_mask_input,
                    vert_subvert_mask_input, vert_num_input, subvert_num_input,
                    rw_vert_input, rw_subvert_input], logits)  # max prob_click_positive
-    model.compile(loss=['categorical_crossentropy'],
+    model.compile(loss=categorical_crossentropy_with_rdrop,
                   optimizer=Adam(lr=0.0001, amsgrad=True),
                   metrics=['acc'])
-
     return model, news_encoder, user_encoder, rwer
